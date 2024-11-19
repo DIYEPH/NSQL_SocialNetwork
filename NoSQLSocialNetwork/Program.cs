@@ -8,10 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
-                options.LoginPath = "/Account/Login"; // Đường dẫn khi người dùng chưa đăng nhập
-                options.LogoutPath = "/Account/Logout"; // Đường dẫn khi người dùng đăng xuất
-                options.ExpireTimeSpan = TimeSpan.FromDays(7); // Thời gian hết hạn của cookie
-                options.SlidingExpiration = true; // Làm mới cookie khi người dùng truy cập lại
+                options.LoginPath = "/Access/Login";
+                options.LogoutPath = "/Access/Logout";
+                options.ExpireTimeSpan = TimeSpan.FromDays(7);
+                options.SlidingExpiration = true;
             });
 
 
