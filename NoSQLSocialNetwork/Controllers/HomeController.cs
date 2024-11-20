@@ -1,10 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NoSQLSocialNetwork.Models;
 using System.Diagnostics;
 
 namespace NoSQLSocialNetwork.Controllers
 {
-    public class HomeController : Controller
+	[Authorize]
+	public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
 

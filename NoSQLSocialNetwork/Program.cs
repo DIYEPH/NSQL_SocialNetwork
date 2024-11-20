@@ -9,7 +9,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             .AddCookie(options =>
             {
                 options.LoginPath = "/Access/Login";
-                options.LogoutPath = "/Access/Logout";
+                options.LogoutPath = "/logout";
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 options.SlidingExpiration = true;
             });
@@ -18,11 +18,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddSingleton<MongoDbService>();
 
 builder.Services.AddControllersWithViews();
-
-
-
-
-
 
 
 var app = builder.Build();
