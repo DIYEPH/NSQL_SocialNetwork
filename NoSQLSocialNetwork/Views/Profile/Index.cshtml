@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Profile Page";
+    Layout = "LayoutNoneSidebar";
+}
+<div class="container">
+    <div class="profile-container">
+        <div class="header">
+            <img class="cover-photo" src="https://placehold.co/800x200" alt="Cover Photo" />
+            <div class="profile-info">
+                <img class="profile-picture" src="https://placehold.co/100x100" alt="Profile Picture" />
+                <h2 class="name">John</h2>
+                <p class="friends-count">2 friends</p>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn add-friend">Thêm vào tin</button>
+            <button class="btn edit-profile">Chỉnh sửa trang cá nhân</button>
+        </div>
+        <div class="tabs">
+            <button class="tab active">Bài viết</button>
+            <button class="tab">Bạn bè</button>
+            <button class="tab">Ảnh</button>
+        </div>
+        @* <div class="gallery">
+            <h3 class="gallery-title">Ảnh</h3>
+            <div class="image-grid">
+                <img src="https://placehold.co/150x150" alt="Image 1" />
+                <img src="https://placehold.co/150x150" alt="Image 2" />
+                <img src="https://placehold.co/150x150" alt="Image 3" />
+                <img src="https://placehold.co/150x150" alt="Image 4" />
+                <img src="https://placehold.co/150x150" alt="Image 5" />
+                <img src="https://placehold.co/150x150" alt="Image 6" />
+            </div>
+        </div> *@
+        @await Component.InvokeAsync("CreatePost")
+    </div>
+</div>

@@ -10,64 +10,58 @@
 			<img src="@Model.Avatar">
 		}else
 		{
-			<img src="images/profile-pic.png">
+			<img src="img/avatardefault.png">
 		}
 
 	</div>
 </div>
-
 <div class="settings-menu">
-	<div id="dark-btn">
-		<span></span>
-	</div>
-	<div class="settings-menu-inner">
-		<div class="user-profile">
-			@if (Model != null)
-			{
-				<img src="@Model.Avatar">
-				<div>
-					<p>@Model.Name</p>
-					<a href="#">See Your Profile</a>
-				</div>
-			}
-			else
-			{
-				<img src="images/profile-pic.png">
-				<div>
-					<p>John Nicholson</p>
-					<a href="#">See Your Profile</a>
-				</div>
-			}
-		</div>
-		<hr>
-		<div class="user-profile">
-			<img src="images/feedback.png">
-			<div>
-				<p>Give Feedback</p>
-				<a href="#">Help us to improve the new design</a>
-			</div>
-		</div>
-		<hr>
+    <div id="dark-btn">
+        <span></span>
+    </div>
+    <div class="settings-menu-inner">
+        <div class="user-profile">
+            @if (Model != null)
+            {
+                <img src="@Model.Avatar">
+            }
+            else
+            {
+                <img src="img/avatardefault.png">
+            }
+            <div>
+                @if (Model != null)
+                {
+                    <p>@Model.Name</p>
+                }
+                else
+                {
+                    <p></p>
+                }       
+                <a asp-action="Index" asp-controller="Profile">See Your Profile</a>
+            </div>
+        </div>
+        <hr>
 
-		<div class="settings-links">
-			<img src="images/setting.png" class="settings-icon">
-			<a href="#">Settings & Privacy</a>
-			<img src="images/arrow.png" width="10px">
-		</div>
-		<div class="settings-links">
-			<img src="images/help.png" class="settings-icon">
-			<a href="#">Help & Support</a>
-			<img src="images/arrow.png" width="10px">
-		</div>
-		<div class="settings-links">
-			<img src="images/display.png" class="settings-icon">
-			<a href="#">Display & Accessibility</a>
-			<img src="images/arrow.png" width="10px">
-		</div>
-		<div class="settings-links">
-			<img src="images/logout.png" class="settings-icon">
-			<a href="/logout">Logout</a>
-			<img src="images/arrow.png" width="10px">
-		</div>
-	</div>
+        <div class="settings-links">
+            <img src="images/setting.png" class="settings-icon">
+            <a href="#">Settings & Privacy</a>
+            <img src="images/arrow.png" width="10px">
+        </div>
+        <div class="settings-links">
+            <img src="images/help.png" class="settings-icon">
+            <a href="#">Help & Support</a>
+            <img src="images/arrow.png" width="10px">
+        </div>
+        <div class="settings-links">
+            <img src="images/display.png" class="settings-icon">
+            <a href="#">Display & Accessibility</a>
+            <img src="images/arrow.png" width="10px">
+        </div>
+        <div class="settings-links">
+            <img src="images/logout.png" class="settings-icon">
+            <a asp-action="Logout" asp-controller="Access">Logout</a>
+            <img src="images/arrow.png" width="10px">
+        </div>
+    </div>
 </div>

@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using NoSQLSocialNetwork.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 

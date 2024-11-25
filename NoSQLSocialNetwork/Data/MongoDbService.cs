@@ -15,10 +15,9 @@ namespace NoSQLSocialNetwork.Data
             var connectionString = _configuration.GetConnectionString("DbConnection");
             var mongoUrl = MongoUrl.Create(connectionString);
             var mongoClient = new MongoClient(mongoUrl);
-            _database = mongoClient.GetDatabase(mongoUrl.DatabaseName);
+            _database = mongoClient.GetDatabase("SocialNetwork");
         }
         public IMongoDatabase? Database => _database;
 
-        public IMongoCollection<User> Users => _database.GetCollection<User>("users");
     }
 }
