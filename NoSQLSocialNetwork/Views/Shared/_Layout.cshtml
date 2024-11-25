@@ -3,14 +3,15 @@
 	<title>@ViewData["Title"]</title>
 	<link rel="icon" href="/images/logo.png" type="image/x-icon" />
 	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/profile.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-
-
 	<nav>
 		<div class="nav-left">
-			<img src="images/logo.png" class="logo">
+			<a asp-action="Index" asp-controller="Home">
+				<img src="images/logo.png" class="logo">
+			</a>
 			<ul>
 				<li>
 					<img src="images/notification.png">
@@ -28,9 +29,17 @@
 			@await Component.InvokeAsync("AvatarProfile")
 		}
 	</nav>
-	@RenderBody()
+	<div class="container">
+		@await Component.InvokeAsync("LeftSidebar")
+		<div class="main-content">
+			@await Component.InvokeAsync("ListStory")
+			@await Component.InvokeAsync("CreatePost")
+			@RenderBody()
+		</div>
+		@await Component.InvokeAsync("RightSidebar")
+	</div>
 	<div class="footer">
-		<p>Copyright 2021 - Lets Try This YouTube Channel</p>
+		
 	</div>
 
 	<script src="js/script.js"></script>

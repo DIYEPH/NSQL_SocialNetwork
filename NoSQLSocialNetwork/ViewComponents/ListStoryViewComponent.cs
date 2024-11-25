@@ -7,10 +7,10 @@ using System.Security.Claims;
 
 namespace NoSQLSocialNetwork.ViewComponents
 {
-	public class AvatarProfileViewComponent : ViewComponent
+	public class ListStoryViewComponent: ViewComponent
 	{
 		private readonly IMongoCollection<User>? _users;
-		public AvatarProfileViewComponent(MongoDbService mongoDbService)
+		public ListStoryViewComponent(MongoDbService mongoDbService)
 		{
 			_users = mongoDbService.Database?.GetCollection<User>("Users");
 		}
@@ -23,7 +23,7 @@ namespace NoSQLSocialNetwork.ViewComponents
 
 				if (userIdClaim != null)
 				{
-					var userId = ObjectId.Parse(userIdClaim.Value); 
+					var userId = ObjectId.Parse(userIdClaim.Value);
 					var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
 
 					var result = new

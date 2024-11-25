@@ -8,12 +8,14 @@
 	--body-color: #efefef;
 	--nav-color: #1876f2;
 	--bg-color: #fff;
+	--link-color: #1876f2;
 
 }
 .dark-theme{
 	--body-color: #0a0a0a;
 	--nav-color: #000;
 	--bg-color: #000;
+	--link-color: #fff;
 }
 
 body{
@@ -122,9 +124,6 @@ nav{
 .imp-links a img{
 	width: 25px;
 	margin-right: 15px;	
-}
-.imp-links a:last-child{
-	color: var(--nav-color);
 }
 .imp-links{
 	border-bottom: 1px solid #ccc;
@@ -240,21 +239,7 @@ nav{
 	color:#fff;
 	font-size: 14px;
 }
-.story1{
-	background-image: linear-gradient(transparent,rgba(0,0,0,0.5)), url(../images/status-1.png);
-}
-.story2{
-	background-image: linear-gradient(transparent,rgba(0,0,0,0.5)), url(../images/status-2.png);
-}
-.story3{
-	background-image: linear-gradient(transparent,rgba(0,0,0,0.5)), url(../images/status-3.png);
-}
-.story4{
-	background-image: linear-gradient(transparent,rgba(0,0,0,0.5)), url(../images/status-4.png);
-}
-.story5{
-	background-image: linear-gradient(transparent,rgba(0,0,0,0.5)), url(../images/status-5.png);
-}
+
 .story.story1 img{
 	top:unset;
 	left: 50%;
