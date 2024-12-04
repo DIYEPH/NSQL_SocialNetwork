@@ -1,202 +1,125 @@
-﻿@{
+﻿@using NoSQLSocialNetwork.ViewModels
+@{
     ViewData["Title"] = "Socialbook";
 }
+@await Component.InvokeAsync("ListStory")
+@await Component.InvokeAsync("CreatePost")
+@model IEnumerable<PostVM>
+@foreach (var post in Model)
+{
+    <div class="post-container">
+        <div class="post-row">
+            <div class="user-profile">
+                <img src="@post.AuthorAvatar">
+                <div>
+                    <p>@post.AuthorName</p>
+                    <span>@post.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+            </div>
+            <a href="#">
+                <i class="fa fa-ellipsis-v"></i>
+            </a>
+        </div>
 
-<div class="post-container">
-	<div class="post-row">
-		<div class="user-profile">
-			<img src="images/profile-pic.png">
-			<div>
-				<p>John Nicholson</p>
-				<span>June 21 2021, 13:40</span>
-			</div>
-		</div>
-		<a href="#">
-			<i class="fa fa-ellipsis-v"></i>
-		</a>
-	</div>
+        <p class="post-text">
+            @post.Content
+        </p>
 
-	<p class="post-text">
-		Subscribe <span>LetsTryThis</span> YouTube Channel to watch more videos on website development and UI Designs.
-		<a href="#">#letstrythis</a>
-		<a href="#">#youtube</a>
-	</p>
-	<img src="images/feed-image-1.png" class="post-img">
-	<div class="post-row">
-		<div class="activity-icons">
-			<div>
-				<img src="images/like-blue.png">
-				120
-			</div>
-			<div>
-				<img src="images/comments.png">
-				19
-			</div>
-			<div>
-				<img src="images/share.png">
-				120
-			</div>
-		</div>
-		<div class="post-profile-icon">
-			<img src="images/profile-pic.png">
-			<i class="fas fa fa-caret-down"></i>
-		</div>
-	</div>
-</div>
-<div class="post-container">
-	<div class="post-row">
-		<div class="user-profile">
-			<img src="images/member-2.png">
-			<div>
-				<p>Jackson Aston</p>
-				<span>June 21 2021, 3:40</span>
-			</div>
-		</div>
-		<a href="#">
-			<i class="fa fa-ellipsis-v"></i>
-		</a>
-	</div>
+        <div class="post-images-grid" data-images="@string.Join(",", post.ImageUrls ?? new List<string>())">
+            @if (post.ImageUrls != null && post.ImageUrls.Any())
+            {
+                var visibleImages = post.ImageUrls.Take(2).ToList();
+                foreach (var image in visibleImages)
+                {
+                    <img src="@image" class="post-img" alt="Image @image">
+                }
+                if (post.ImageUrls.Count() > 2)
+                {
+                    <div class="more-images">
+                        +@((post.ImageUrls.Count() - 2)) more
+                    </div>
+                }
+            }
+        </div>
 
-	<p class="post-text">
-		Like and Share this video with your friends
-		<a href="#">#letstrythis</a>
-		<a href="#">#youtube</a>
-	</p>
-	<img src="images/feed-image-2.png" class="post-img">
-	<div class="post-row">
-		<div class="activity-icons">
-			<div>
-				<img src="images/like.png">
-				120
-			</div>
-			<div>
-				<img src="images/comments.png">
-				19
-			</div>
-			<div>
-				<img src="images/share.png">
-				120
-			</div>
-		</div>
-		<div class="post-profile-icon">
-			<img src="images/profile-pic.png">
-			<i class="fas fa fa-caret-down"></i>
-		</div>
-	</div>
-</div>
-<div class="post-container">
-	<div class="post-row">
-		<div class="user-profile">
-			<img src="images/profile-pic.png">
-			<div>
-				<p>John Nicholson</p>
-				<span>June 21 2021, 13:40</span>
-			</div>
-		</div>
-		<a href="#">
-			<i class="fa fa-ellipsis-v"></i>
-		</a>
-	</div>
-
-	<p class="post-text">
-		Subscribe <span>LetsTryThis</span> YouTube Channel to watch more videos on website development and UI Designs.
-		<a href="#">#letstrythis</a>
-		<a href="#">#youtube</a>
-	</p>
-	<img src="images/feed-image-3.png" class="post-img">
-	<div class="post-row">
-		<div class="activity-icons">
-			<div>
-				<img src="images/like.png">
-				120
-			</div>
-			<div>
-				<img src="images/comments.png">
-				19
-			</div>
-			<div>
-				<img src="images/share.png">
-				120
-			</div>
-		</div>
-		<div class="post-profile-icon">
-			<img src="images/profile-pic.png">
-			<i class="fas fa fa-caret-down"></i>
-		</div>
-	</div>
-</div>
-<div class="post-container">
-	<div class="post-row">
-		<div class="user-profile">
-			<img src="images/profile-pic.png">
-			<div>
-				<p>John Nicholson</p>
-				<span>June 21 2021, 13:40</span>
-			</div>
-		</div>
-		<a href="#">
-			<i class="fa fa-ellipsis-v"></i>
-		</a>
-	</div>
-
-	<p class="post-text"></p>
-	<img src="images/feed-image-4.png" class="post-img">
-	<div class="post-row">
-		<div class="activity-icons">
-			<div>
-				<img src="images/like.png">
-				120
-			</div>
-			<div>
-				<img src="images/comments.png">
-				19
-			</div>
-			<div>
-				<img src="images/share.png">
-				120
-			</div>
-		</div>
-		<div class="post-profile-icon">
-			<img src="images/profile-pic.png">
-			<i class="fas fa fa-caret-down"></i>
-		</div>
-	</div>
-</div>
-<div class="post-container">
-	<div class="post-row">
-		<div class="user-profile">
-			<img src="images/profile-pic.png">
-			<div>
-				<p>John Nicholson</p>
-				<span>June 21 2021, 13:40</span>
-			</div>
-		</div>
-		<a href="#">
-			<i class="fa fa-ellipsis-v"></i>
-		</a>
-	</div>
-
-	<p class="post-text">Meeting going on</p>
-	<img src="images/feed-image-5.png" class="post-img">
-	<div class="post-row">
-		<div class="activity-icons">
-			<div>
-				<img src="images/like.png">
-				120
-			</div>
-			<div>
-				<img src="images/comments.png">
-				19
-			</div>
-			<div>
-				<img src="images/share.png">
-				120
-			</div>
-		</div>
-		<div class="post-profile-icon">
-			<img src="images/profile-pic.png">
-			<i class="fas fa fa-caret-down"></i>
-		</div>
-	</div>
-</div>
+        <div class="post-row">
+            <div class="activity-icons">
+                <div>
+                    @Html.AntiForgeryToken()
+                    <a href="#" name="btnLike" id="btnLike_@post.Id">
+                        <img src="images/like.png" alt="Like">
+                    </a>
+                    <span>@(post.Likes?.Count() ?? 0)</span>
+                </div>
+                <div>
+                    <img src="images/comments.png" alt="Comments">
+                    @(post.Comments?.Count() ?? 0)
+                </div>
+                <div>
+                    <img src="images/share.png" alt="Share">
+                </div>
+            </div>
+            
+        </div>
+    </div>
+}
 <button type="button" class="load-more-btn">Load More</button>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[name="btnLike"]').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const postId = this.id.split('_')[1];
+                    const likeButton = this;
+                    fetch(`/Post/LikePost`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify({ postId })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            const likeCountElement = likeButton.nextElementSibling;
+                            likeCountElement.textContent = data.likesCount;
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $(".load-more-btn").click(function () {
+                $.ajax({
+                    url: "/Home/LoadMore",
+                    type: "GET",
+                    success: function (data) {
+                        $(".post-container:last").after(data);
+                    }
+                });
+            });
+        });
+     </script>
+    <script>
+        $(document).ready(function () {
+            $(".post-images-grid").on("click", ".more-images", function () {
+                var $this = $(this);
+                var $postImagesGrid = $this.parent();
+
+                // Get the images from the data-attribute
+                var images = $postImagesGrid.data("images").split(",");
+
+                // Clear existing images and add all images from the data
+                $postImagesGrid.empty();
+                images.forEach(function (image) {
+                    $postImagesGrid.append('<img src="' + image + '" class="post-img" alt="Image ' + image + '">');
+                });
+            });
+        });
+    </script>
+}

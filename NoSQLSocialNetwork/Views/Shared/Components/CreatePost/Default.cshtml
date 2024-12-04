@@ -1,5 +1,5 @@
 ﻿@model dynamic
-<div class="write-post-container">
+<form class="write-post-container">
 	<div class="user-profile">
 		@if (Model != null)
 		{
@@ -19,18 +19,16 @@
 				<p></p>
 			}
 			<small>
-				Public
-				<i class="fas fa fa-caret-down"></i>
+				<select name="post_visibility" class="post-visibility">
+					<option value="public">Public</option>
+					<option value="private">Private</option>
+				</select>
 			</small>
 		</div>
 	</div>
 	<div class="post-input-container">
-		<textarea rows="3" placeholder="What's on your mind, John?"></textarea>
+		<textarea rows="3" name="post_content" placeholder="What's on your mind,  @(Model?.Name != null ? Model.Name : "")?"></textarea>
 		<div class="add-post-links">
-			<a href="#">
-				<img src="images/live-video.png">
-				Live Video
-			</a>
 			<a href="#">
 				<img src="images/photo.png">
 				Photo/Video
@@ -44,4 +42,5 @@
 	<div class="post-button-container">
         <button class="btn post-button">Post</button>
 		</div>
-</div>
+</form>
+
