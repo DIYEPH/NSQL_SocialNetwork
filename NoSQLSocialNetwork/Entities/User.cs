@@ -6,7 +6,6 @@ namespace NoSQLSocialNetwork.Entities
     public class User
     {
         [BsonId]
-        [BsonElement("_id")]
         public ObjectId Id { get; set; }
 
         [BsonElement("email")]
@@ -44,7 +43,7 @@ namespace NoSQLSocialNetwork.Entities
 
         // Các Post sẽ được ánh xạ vào User nếu cần
         [BsonElement("posts")]
-        public List<Post>? Posts { get; set; }
+        public List<Post>? Posts { get; set; } 
     }
 
 

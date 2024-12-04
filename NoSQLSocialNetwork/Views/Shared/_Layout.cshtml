@@ -5,6 +5,9 @@
 	<link rel="stylesheet" href="css/style.css">
 	<link rel="stylesheet" href="css/profile.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	@RenderSection("Styles", required: false)
 </head>
 <body>
 	<nav>
@@ -31,9 +34,7 @@
 	</nav>
 	<div class="container">
 		@await Component.InvokeAsync("LeftSidebar")
-		<div class="main-content">
-			@await Component.InvokeAsync("ListStory")
-			@await Component.InvokeAsync("CreatePost")
+		<div class="main-content">	
 			@RenderBody()
 		</div>
 		@await Component.InvokeAsync("RightSidebar")
@@ -44,4 +45,5 @@
 
 	<script src="js/script.js"></script>
 </body>
+@RenderSection("Scripts", required: false)
 </html>
