@@ -1,25 +1,25 @@
-﻿<div class="left-sidebar">
+﻿@{
+	var currentAction = ViewContext?.RouteData?.Values["action"]?.ToString();
+	var currentController = ViewContext?.RouteData?.Values["controller"]?.ToString();
+}
+<div class="left-sidebar">
 	<div class="imp-links">
-		<a asp-controller="Home" asp-action="Index" style="color: var(--link-color)">
+		<a asp-controller="Home" asp-action="Index" style="@(currentAction == "Index" && currentController == "Home" ? "color: var(--link-color)" : "")">
 			<img src="images/news.png">
-			Latest news
+			Tin tức
 		</a>
-		<a asp-controller="Friend" asp-action="Index">
+		<a asp-controller="Friend" asp-action="Index" style="@(currentAction == "Index" && currentController == "Friend" ? "color: var(--link-color)" : "")">
 			<img src="images/friends.png">
-			Friends
+			Bạn bè
 		</a>
-		<a href="#">
-			<img src="images/group.png">
-			Groups
+		<a asp-controller="Profile" asp-action="Index" style="@(currentAction == "Index" && currentController == "Profile" ? "color: var(--link-color)" : "")">
+			<img src="images/friends.png">
+			Trang cá nhân
 		</a>
-		 <a href="#">
-			<img src="images/marketplace.png">
-			Marketplace
-		</a>
-		<a href="#">
-			<img src="images/watch.png">
-			Watch
-		</a> 
+		@* <a href="#"> *@
+		@* 	<img src="images/group.png"> *@
+		@* 	Nhóm *@
+		@* </a> *@
 		@* <a href="#">
 			See More
 		</a> *@
@@ -27,10 +27,14 @@
 	<div class="shortcut-links">
 		<p>Lời mời kết bạn</p>
 		<a href="#">
-			<img src="images/shortcut-1.png">
+			<img src="images/shortcut-1.png" alt="Shortcut Icon">
 			Web Developers
 		</a>
-		
+		<!-- Buttons for Accept and Reject -->
+		<div class="friend-request-actions">
+			<button class="accept-btn">Đồng ý</button>
+			<button class="reject-btn">Từ chối</button>
+		</div>
 	</div>
 	
 </div>
