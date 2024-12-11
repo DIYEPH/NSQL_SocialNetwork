@@ -41,6 +41,8 @@ namespace NoSQLSocialNetwork.Controllers
 						var sortedPosts = posts.OrderByDescending(post => post.CreatedAt);
 						List<PostVM> postsVM = new List<PostVM>();
 						foreach (var post in sortedPosts)
+						{
+							bool isLiked = post.Likes != null && post.Likes.Contains(userId);
 							postsVM.Add(new PostVM
 							{
 								Id = post.Id,
@@ -53,8 +55,10 @@ namespace NoSQLSocialNetwork.Controllers
 								Status = post.Status,
 								CreatedAt = post.CreatedAt,
 								UpdatedAt = post.UpdatedAt,
-								Comments = post.Comments
-							});
+								Comments = post.Comments,
+                                IsLiked = isLiked
+                            });
+						}
 						return View(postsVM);
 					}
 				}
