@@ -1,59 +1,208 @@
-﻿<div class="friend-requests">
-    <div class="friend-request-title">
-        <h3>Thêm bạn bè</h3>
-    </div>
-    <!-- Lời mời kết bạn -->
-    <div class="friend-request">
-        <div class="friend-info">
-            <img src="images/user-avatar1.png" alt="User Avatar" class="user-avatar">
-            <span class="user-name">John Doe</span>
+﻿@using NoSQLSocialNetwork.Entities
+
+@{
+    ViewData["Title"] = "Friend";
+
+    // Lấy dữ liệu từ ViewBag và ép kiểu đúng
+    var usersNotFollowed = ViewBag.UsersNotFollowed as List<User>;
+    var usersInvitation = ViewBag.Invitation as List<User>;
+    var usersFriend = ViewBag.Friend as List<User>;
+    var usersFollowing = ViewBag.FollowingUsers as List<User>;
+}
+<div class="friend-requests">
+    <!-- Add Friends Section -->
+    <div id="friend-requests-add">
+        <div class="friend-request-title">
+            <h3>Thêm bạn bè</h3>
         </div>
-        <div class="friend-actions">
-            <button class="btn-accept">Gửi lời mời</button>
-        </div>
-    </div>
-    <div class="friend-request-title">
-        <h3>Lời mời kết bạn</h3>
-    </div>
-    <!-- Lời mời kết bạn -->
-    <div class="friend-request">
-        <div class="friend-info">
-            <img src="images/user-avatar1.png" alt="User Avatar" class="user-avatar">
-            <span class="user-name">John Doe</span>
-        </div>
-        <div class="friend-actions">
-            <button class="btn-accept">Đồng ý</button>
-            <button class="btn-decline">Từ chối</button>
-        </div>
+        @if (usersNotFollowed == null || !usersNotFollowed.Any())
+        {
+            <p>Chưa có người nào</p>
+        }
+        else
+        {
+            @foreach (var item in usersNotFollowed)
+            {
+                <div class="friend-request" data-user-id="@item.Id">
+                    <div class="friend-info">
+                        <img src="@item.AvatarUrl" alt="User Avatar" class="user-avatar">
+                        <span class="user-name">@item.FullName</span>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="btn-add">Thêm bạn bè</button>
+                    </div>
+                </div>
+            }
+        }
     </div>
 
-    <div class="friend-request">
-        <div class="friend-info">
-            <img src="images/user-avatar2.png" alt="User Avatar" class="user-avatar">
-            <span class="user-name">Jane Smith</span>
+    <!-- Friend Invitations Section -->
+    <div id="friend-requests-pending">
+        <div class="friend-request-title">
+            <h3>Lời mời kết bạn</h3>
         </div>
-        <div class="friend-actions">
-            <button class="btn-accept">Đồng ý</button>
-            <button class="btn-decline">Từ chối</button>
-        </div>
+        @if (usersInvitation ==null)
+        {
+            <p>Không có lời mời nào.</p>
+        }
+        else
+        {
+            @foreach (var item in ViewBag.Invitation)
+            {
+                <div class="friend-request" data-user-id="@item.Id">
+                    <div class="friend-info">
+                        <img src="@item.AvatarUrl" alt="User Avatar" class="user-avatar">
+                        <span class="user-name">@item.FullName</span>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="btn-accept">Đồng ý</button>
+                        <button class="btn-decline">Từ chối</button>
+                    </div>
+                </div>
+            }
+        }
     </div>
+    <div id="friend-list">
+        <div class="friend-list-title">
+            <h3>Danh sách đã gửi lời mời</h3>
+        </div>
+        @if (usersFollowing == null || !usersFollowing.Any())
+        {
+            <p>Chưa có ai</p>
+        }
+        else
+        {
+            @foreach (var item in usersFollowing)
+            {
+                <div class="friend-request" data-user-id="@item.Id">
+                    <div class="friend-info">
+                        <img src="@item.AvatarUrl" alt="User Avatar" class="user-avatar">
+                        <span class="user-name">@item.FullName</span>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="btn-cancel">Hủy lời mời</button>
+                    </div>
+                </div>
 
-    <!-- Danh sách bạn bè -->
-    <div class="friend-list">
+            }
+        }
+    </div>
+    <!-- Friend List Section -->
+    <div id="friend-list">
         <div class="friend-list-title">
             <h3>Danh sách bạn bè</h3>
         </div>
-        <div class="friend">
-            <img src="images/user-avatar3.png" alt="User Avatar" class="user-avatar">
-            <span class="user-name">Mike Johnson</span>
-        </div>
-        <div class="friend">
-            <img src="images/user-avatar4.png" alt="User Avatar" class="user-avatar">
-            <span class="user-name">Emma Williams</span>
-        </div>
-        <div class="friend">
-            <img src="images/user-avatar5.png" alt="User Avatar" class="user-avatar">
-            <span class="user-name">Chris Evans</span>
-        </div>
+        @if (usersFriend == null || !usersFriend.Any())
+        {
+            <p>Chưa có bạn bè nào.</p>
+        }
+        else
+        {
+            @foreach (var item in usersFriend)
+            {
+                <div class="friend-request" >
+                    <div class="friend-info">
+                        <img src="@item.AvatarUrl" alt="User Avatar" class="user-avatar">
+                        <span class="user-name">@item.FullName</span>
+                    </div>
+                   
+                </div>
+            }
+        }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        const friendActions = {
+            addFriend: async (userId) => {
+                try {
+                    const response = await fetch('/Friend/AddFriend', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ userId }),
+                    });
+
+                    if (response.ok) {
+                        alert('\u0110\u00e3 g\u1eedi y\u00eau c\u1ea7u k\u1ebft b\u1ea1n!');
+                        location.reload();
+                    } else {
+                        alert('C\u00f3 l\u1ed7i x\u1ea3y ra. Vui l\u00f2ng th\u1eed l\u1ea1i!');
+                    }
+                } catch (error) {
+                    console.error('Error adding friend:', error);
+                    alert('C\u00f3 l\u1ed7i x\u1ea3y ra khi th\u00eam b\u1ea1n b\u00e8.');
+                }
+            },
+
+            acceptInvitation: async (userId) => {
+                try {
+                    const response = await fetch('/Friend/AcceptFriend', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ userId }),
+                    });
+
+                    if (response.ok) {
+                        alert('\u0110\u00e3 ch\u1ea5p nh\u1eadn l\u1eddi m\u1eddi k\u1ebft b\u1ea1n!');
+                        location.reload();
+                    } else {
+                        alert('C\u00f3 l\u1ed7i x\u1ea3y ra. Vui l\u00f2ng th\u1eed l\u1ea1i!');
+                    }
+                } catch (error) {
+                    console.error('Error accepting invitation:', error);
+                    alert('C\u00f3 l\u1ed7i x\u1ea3y ra khi ch\u1ea5p nh\u1eadn l\u1eddi m\u1eddi.');
+                }
+            },
+
+            declineInvitation: async (userId) => {
+                try {
+                    const response = await fetch('/api/friends/decline', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ userId }),
+                    });
+
+                    if (response.ok) {
+                        alert('\u0110\u00e3 t\u1eeb ch\u1ed1i l\u1eddi m\u1eddi k\u1ebft b\u1ea1n!');
+                        location.reload();
+                    } else {
+                        alert('C\u00f3 l\u1ed7i x\u1ea3y ra. Vui l\u00f2ng th\u1eed l\u1ea1i!');
+                    }
+                } catch (error) {
+                    console.error('Error declining invitation:', error);
+                    alert('C\u00f3 l\u1ed7i x\u1ea3y ra khi t\u1eeb ch\u1ed1i l\u1eddi m\u1eddi.');
+                }
+            },
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.btn-add').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const userId = button.closest('.friend-request').dataset.userId;
+                    friendActions.addFriend(userId);
+                });
+            });
+
+            document.querySelectorAll('.btn-accept').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const userId = button.closest('.friend-request').dataset.userId;
+                    friendActions.acceptInvitation(userId);
+                });
+            });
+
+            document.querySelectorAll('.btn-decline').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const userId = button.closest('.friend-request').dataset.userId;
+                    friendActions.declineInvitation(userId);
+                });
+            });
+        });
+    </script>
+}

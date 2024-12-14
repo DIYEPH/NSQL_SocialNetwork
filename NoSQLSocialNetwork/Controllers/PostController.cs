@@ -18,68 +18,89 @@ namespace NoSQLSocialNetwork.Controllers
 		{
 			_users = mongoDbService.Database?.GetCollection<User>("Users");
 		}
-		[HttpPost("Create")]
-		public async Task<IActionResult> CreatePost([FromForm] CreatePostVM postForm)
-		{
-			if (User.Identity?.IsAuthenticated == true)
-			{
-				var claimsPrincipal = User as ClaimsPrincipal;
-				var userIdClaim = claimsPrincipal?.FindFirst(ClaimTypes.NameIdentifier);
+        [HttpPost("Create")]
+        public async Task<IActionResult> CreatePost([FromForm] CreatePostVM postForm)
+        {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var claimsPrincipal = User as ClaimsPrincipal;
+                var userIdClaim = claimsPrincipal?.FindFirst(ClaimTypes.NameIdentifier);
 
-				if (_users == null)
-				{
-					return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Database connection error." });
-				}
+                if (_users == null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Database connection error." });
+                }
 
-				if (userIdClaim != null)
-				{
-					var userId = ObjectId.Parse(userIdClaim.Value);
+                if (userIdClaim != null)
+                {
+                    var userId = ObjectId.Parse(userIdClaim.Value);
 
-					// Xử lý tải lên hình ảnh
-					var imageUrls = new List<string>();
-					if (postForm.Images != null && postForm.Images.Any())
-					{
-						foreach (var file in postForm.Images)
-						{
-							if (file.Length > 0)
-							{
-								var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-								var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", fileName);
-								using (var stream = new FileStream(filePath, FileMode.Create))
-								{
-									await file.CopyToAsync(stream);
-								}
-								var fileUrl = $"/uploads/{fileName}";
-								imageUrls.Add(fileUrl);  // Thêm URL của mỗi hình vào danh sách
-							}
-						}
-					}
-					var post = new Post
-					{
-						AuthorId = userId,
-						Content = postForm.Content,
-						ImageUrls = imageUrls,  
-						CreatedAt = DateTime.UtcNow,
-						UpdatedAt = DateTime.UtcNow
-					};
+                    // Xử lý tải lên hình ảnh
+                    var imageUrls = new List<string>();
+                    if (postForm.Images != null && postForm.Images.Any())
+                    {
+                        foreach (var file in postForm.Images)
+                        {
+                            if (file.Length > 0)
+                            {
+                                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", fileName);
+                                using (var stream = new FileStream(filePath, FileMode.Create))
+                                {
+                                    await file.CopyToAsync(stream);
+                                }
+                                var fileUrl = $"/uploads/{fileName}";
+                                imageUrls.Add(fileUrl);  // Thêm URL của mỗi hình vào danh sách
+                            }
+                        }
+                    }
 
-					var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
-					if (user != null)
-					{
-						if (user.Posts == null)
-						{
-							user.Posts = new List<Post>();  
-						}
-						var update = Builders<User>.Update.Push(u => u.Posts, post);
-						await _users.UpdateOneAsync(u => u.Id == userId, update);
-					}
+                    var post = new Post
+                    {
+                        AuthorId = userId,
+                        Content = postForm.Content,
+                        ImageUrls = imageUrls,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
 
-					return Ok(new { message = "Post created successfully!" });
-				}
-			}
-			return Unauthorized();
-		}
-		
+                    // Lấy người dùng từ cơ sở dữ liệu
+                    var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
+                    if (user != null)
+                    {
+                        // Kiểm tra nếu danh sách Posts là null, tạo mảng mới
+                        if (user.Posts == null)
+                        {
+                            user.Posts = new List<Post>();
+                        }
+
+                        // Thêm bài viết vào danh sách Posts
+                        user.Posts.Add(post);
+
+                        // Cập nhật tài liệu người dùng
+                        var update = Builders<User>.Update.Set(u => u.Posts, user.Posts);
+                        var result = await _users.UpdateOneAsync(u => u.Id == userId, update);
+
+                        // Kiểm tra xem việc cập nhật có thành công không
+                        if (result.ModifiedCount > 0)
+                        {
+                            return Ok(new { message = "Post created successfully!" });
+                        }
+                        else
+                        {
+                            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to create post." });
+                        }
+                    }
+                    else
+                    {
+                        return NotFound(new { message = "User not found." });
+                    }
+                }
+            }
+            return Unauthorized();
+        }
+
+
         [HttpPost("Like")]
         public async Task<IActionResult> LikePost([FromBody] LikeRequest request)
         {
