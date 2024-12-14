@@ -35,32 +35,40 @@ namespace NoSQLSocialNetwork.Controllers
 				{
 					var userId = ObjectId.Parse(userIdClaim.Value);
 					var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
-					if (user != null)
+					var listFollowings = user?.Followings ?? new List<ObjectId>();
+                    if (user != null)
 					{
-						var posts = user.Posts ?? new List<Post>();
-						var sortedPosts = posts.OrderByDescending(post => post.CreatedAt);
-						List<PostVM> postsVM = new List<PostVM>();
-						foreach (var post in sortedPosts)
-						{
-							bool isLiked = post.Likes != null && post.Likes.Contains(userId);
-							postsVM.Add(new PostVM
-							{
-								Id = post.Id,
-								AuthorId = post.AuthorId,
-								AuthorAvatar = user.AvatarUrl,
-								AuthorName = user.FullName,
-								Content = post.Content,
-								ImageUrls = post.ImageUrls,
-								Likes = post.Likes,
-								Status = post.Status,
-								CreatedAt = post.CreatedAt,
-								UpdatedAt = post.UpdatedAt,
-								Comments = post.Comments,
-                                IsLiked = isLiked
-                            });
-						}
-						return View(postsVM);
-					}
+						listFollowings.Add(user.Id);
+						var users = await _users.Find(u => listFollowings.Contains(u.Id)).ToListAsync();
+						var posts = new List<PostVM>();
+                        foreach (var u in users)
+                        {
+                            // Lấy bài viết của người dùng này
+                            var postsUser = u.Posts ?? new List<Post>(); // Nếu không có bài viết, tạo một danh sách rỗng
+                            foreach (var post in postsUser)
+                            {
+                                bool isLiked = post.Likes != null && post.Likes.Contains(userId); // Kiểm tra xem người dùng có thích bài viết này không
+                                posts.Add(new PostVM
+                                {
+                                    Id = post.Id,
+                                    AuthorId = post.AuthorId,
+                                    AuthorAvatar = u.AvatarUrl, // Avatar của người dùng này
+                                    AuthorName = u.FullName, // Tên người dùng này
+                                    Content = post.Content,
+                                    ImageUrls = post.ImageUrls,
+                                    Likes = post.Likes,
+                                    Status = post.Status,
+                                    CreatedAt = post.CreatedAt,
+                                    UpdatedAt = post.UpdatedAt,
+                                    //Comments = post.Comments,
+                                    IsLiked = isLiked
+                                });
+                            }
+                        }
+                        var sortedPosts = posts.OrderByDescending(p => p.CreatedAt).ToList();
+
+                        return View(sortedPosts);
+                    }
 				}
 			}
 			return Unauthorized();

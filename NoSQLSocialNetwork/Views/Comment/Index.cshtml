@@ -1,79 +1,98 @@
-﻿@using NoSQLSocialNetwork.ViewModels
+﻿@using NoSQLSocialNetwork.Entities
+@using NoSQLSocialNetwork.ViewModels
 @{
     ViewData["Title"] = "Socialbook";
 }
-@* @await Component.InvokeAsync("ListStory") *@
-@await Component.InvokeAsync("CreatePost")
-@model IEnumerable<PostVM>
-@foreach (var post in Model)
-{
-    <div class="post-container">
-        <div class="post-row">
-            <div class="user-profile">
-                <img src="@post.AuthorAvatar">
-                <div>
-                    <p>@post.AuthorName</p>
-                    <span>@post.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
-                </div>
+
+@model PostVM
+
+<div class="post-container">
+    <div class="post-row">
+        <div class="user-profile">
+            <img src="@Model.AuthorAvatar">
+            <div>
+                <p>@Model.AuthorName</p>
+                <span>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
             </div>
-            <a href="#">
-                <i class="fa fa-ellipsis-v"></i>
-            </a>
+        </div>
+        <a href="#">
+            <i class="fa fa-ellipsis-v"></i>
+        </a>
+    </div>
+
+    <p class="post-text">
+        @Model.Content
+    </p>
+
+    <div class="post-images-grid" data-images="@string.Join(",", Model.ImageUrls ?? new List<string>())">
+        @if (Model.ImageUrls != null && Model.ImageUrls.Any())
+        {
+            var visibleImages = Model.ImageUrls.Take(2).ToList();
+            foreach (var image in visibleImages)
+            {
+                <img src="@image" class="post-img" alt="Image @image">
+            }
+            if (Model.ImageUrls.Count() > 2)
+            {
+                <div class="more-images">
+                    +@((Model.ImageUrls.Count() - 2)) more
+                </div>
+            }
+        }
+    </div>
+
+    <div class="post-row">
+        <div class="activity-icons">
+            <div>
+                @Html.AntiForgeryToken()
+                <a href="#" name="btnLike" id="btnLike_@Model.Id">
+                    @if (Model.IsLiked)
+                    {
+                        <img src="images/like-blue.png" alt="Like">
+                    }
+                    else
+                    {
+                        <img src="images/like.png" alt="Like">
+                    }
+                </a>
+                <span>@(Model.Likes?.Count() ?? 0)</span>
+            </div>
+            <div>
+                <a>
+                    <img src="images/comments.png" alt="Comments">
+                </a>
+
+                @(Model.Comments?.Count() ?? 0)
+            </div>
+            <div>
+                <img src="images/share.png" alt="Share">
+            </div>
         </div>
 
-        <p class="post-text">
-            @post.Content
-        </p>
+    </div>
+    <div class="comments-section">
+        <div class="comment-input">
+            <form method="post" action="@Url.Action("Comment/AddComment", "Post", new { postId = Model.Id })">
+                <textarea name="CommentContent" placeholder="Viết bình luận..."></textarea>
+                <button type="submit">Bình luận</button>
+            </form>
+        </div>
 
-        <div class="post-images-grid" data-images="@string.Join(",", post.ImageUrls ?? new List<string>())">
-            @if (post.ImageUrls != null && post.ImageUrls.Any())
+        <div class="comments-list">
+            @foreach (var comment in Model.Comments ?? new List<CommentVM>())
             {
-                var visibleImages = post.ImageUrls.Take(2).ToList();
-                foreach (var image in visibleImages)
-                {
-                    <img src="@image" class="post-img" alt="Image @image">
-                }
-                if (post.ImageUrls.Count() > 2)
-                {
-                    <div class="more-images">
-                        +@((post.ImageUrls.Count() - 2)) more
+                <div class="comment-item">
+                    <div class="comment-author">
+                        <img src="a" alt="Avatar">
+                        <p>@comment.FullName</p>
                     </div>
-                }
+                    <p>@comment.Content</p>
+                    <span>@comment.CreateAt.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
             }
         </div>
-
-        <div class="post-row">
-            <div class="activity-icons">
-                <div>
-                    @Html.AntiForgeryToken()
-                    <a href="#" name="btnLike" id="btnLike_@post.Id">
-                        @if (post.IsLiked)
-                        {
-                            <img src="images/like-blue.png" alt="Like">
-                        }
-                        else
-                        {
-                            <img src="images/like.png" alt="Like">
-                        }
-                    </a>
-                    <span>@(post.Likes?.Count() ?? 0)</span>
-                </div>
-                <div>
-                    <a href="Comment?postId=@post.Id" name="btnComment" id="btnComment_@post.Id">
-                        <img src="images/comments.png" alt="Comments">
-                    </a>
-                    
-                    @(post.Comments?.Count() ?? 0)
-                </div>
-                <div>
-                    <img src="images/share.png" alt="Share">
-                </div>
-            </div>
-            
-        </div>
     </div>
-}
-<button type="button" class="load-more-btn">Load More</button>
+</div>
 
 @section Scripts {
     <script>
@@ -82,9 +101,9 @@
                 button.addEventListener('click', function (e) {
                     e.preventDefault();
                     const likeButton = this;
-                    const imgLike = likeButton.querySelector('img'); 
+                    const imgLike = likeButton.querySelector('img');
                     const postId = this.id.split('_')[1];
-                    const isLiked = imgLike.src.includes('like-blue.png'); 
+                    const isLiked = imgLike.src.includes('like-blue.png');
                     imgLike.src = isLiked ? 'images/like.png' : 'images/like-blue.png';
                     fetch(`/api/Post/Like`, {
                         method: 'POST',
@@ -118,7 +137,7 @@
                 });
             });
         });
-     </script>
+    </script>
     <script>
         $(document).ready(function () {
             $(".post-images-grid").on("click", ".more-images", function () {

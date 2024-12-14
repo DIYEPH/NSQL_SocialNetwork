@@ -11,7 +11,7 @@ namespace NoSQLSocialNetwork.ViewModels
 
 		public List<string>? ImageUrls { get; set; }
         public List<ObjectId>? Likes { get; set; }
-		public List<Comment>? Comments { get; set; }
+		public List<CommentVM>? Comments { get; set; }
 
 		public ObjectId AuthorId { get; set; }
 		public string? AuthorAvatar { get; set; }
@@ -20,5 +20,6 @@ namespace NoSQLSocialNetwork.ViewModels
 		public DateTime UpdatedAt { get; set; }
 		public int Status { get; set; }
         public bool IsLiked { get; set; }
+
     }
 }

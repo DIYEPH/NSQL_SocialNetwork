@@ -17,6 +17,7 @@ namespace NoSQLSocialNetwork.Controllers
         }
         public async Task<IActionResult> Index()
         {
+
             if (User.Identity?.IsAuthenticated == true)
             {
                 var claimsPrincipal = User as ClaimsPrincipal;
@@ -26,7 +27,7 @@ namespace NoSQLSocialNetwork.Controllers
                 {
                     var userId = ObjectId.Parse(userIdClaim.Value);
                     var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
-
+                    ViewBag.User = user;
                     if (user != null)
                     {
                         var result = new
@@ -52,7 +53,7 @@ namespace NoSQLSocialNetwork.Controllers
                                 Status = post.Status,
                                 CreatedAt = post.CreatedAt,
                                 UpdatedAt = post.UpdatedAt,
-                                Comments = post.Comments,
+                                //Comments = post.Comments,
                                 IsLiked = isLiked
                             });
                         }
