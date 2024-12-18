@@ -1,0 +1,202 @@
+﻿@using NoSQLSocialNetwork.Entities
+@using NoSQLSocialNetwork.ViewModels
+@{
+    ViewData["Title"] = "Search";
+
+    var usersNotFollowed = ViewBag.UsersNotFollowed as List<User>;
+    var usersFriend = ViewBag.Friend as List<User>;
+}
+@model IEnumerable<PostVM>
+<div class="search-container">
+    <!-- Tabs Navigation -->
+    <div class="search-tabs">
+        <button class="search-tab-link search-active" onclick="openSearchTab(event, 'search-posts')">Bài đăng</button>
+        <button class="search-tab-link" onclick="openSearchTab(event, 'search-friends')">Bạn bè</button>
+        <button class="search-tab-link" onclick="openSearchTab(event, 'search-people')">Mọi người</button>
+    </div>
+
+    <!-- Tabs Content -->
+    <div class="search-tab-content">
+        <div id="search-posts" class="search-tab-pane search-active">
+            @foreach (var post in Model)
+            {
+                <div class="post-container">
+                    <div class="post-row">
+                        <div class="user-profile">
+                            <img src="@post.AuthorAvatar">
+                            <div>
+                                <p>@post.AuthorName</p>
+                                <span>@post.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                        </div>
+                        <a href="#">
+                            <i class="fa fa-ellipsis-v"></i>
+                        </a>
+                    </div>
+
+                    <p class="post-text">
+                        @post.Content
+                    </p>
+
+                    <div class="post-images-grid" data-images="@string.Join(",", post.ImageUrls ?? new List<string>())">
+                        @if (post.ImageUrls != null && post.ImageUrls.Any())
+                        {
+                            var visibleImages = post.ImageUrls.Take(2).ToList();
+                            foreach (var image in visibleImages)
+                            {
+                                <img src="@image" class="post-img" alt="Image @image">
+                            }
+                            if (post.ImageUrls.Count() > 2)
+                            {
+                                <div class="more-images">
+                                    +@((post.ImageUrls.Count() - 2)) more
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="post-row">
+                        <div class="activity-icons">
+                            <div>
+                                @Html.AntiForgeryToken()
+                                <a href="#" name="btnLike" id="btnLike_@post.Id">
+                                    @if (post.IsLiked)
+                                    {
+                                        <img src="images/like-blue.png" alt="Like">
+                                    }
+                                    else
+                                    {
+                                        <img src="images/like.png" alt="Like">
+                                    }
+                                </a>
+                                <span>@(post.Likes?.Count() ?? 0)</span>
+                            </div>
+                            <div>
+                                <a href="Comment?postId=@post.Id" name="btnComment" id="btnComment_@post.Id">
+                                    <img src="images/comments.png" alt="Comments">
+                                </a>
+
+                                @(post.Comments?.Count() ?? 0)
+                            </div>
+                            <div>
+                                <img src="images/share.png" alt="Share">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Tab 2: Bạn bè -->
+        <div id="search-friends" class="search-tab-pane">
+            @if (usersFriend == null || !usersFriend.Any())
+            {
+                <div>
+                    <p>Chưa có bạn bè nào.</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var item in usersFriend)
+                {
+                    <div class="friend-request">
+                        <div class="friend-info">
+                            <img src="@item.AvatarUrl" alt="User Avatar" class="user-avatar">
+                            <span class="user-name">@item.FullName</span>
+                        </div>
+
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- Tab 3: Mọi người -->
+        <div id="search-people" class="search-tab-pane">
+            @if (usersNotFollowed == null || !usersNotFollowed.Any())
+            {
+                <div class="friend-request">
+                    <p>Chưa có người nào chưa tương tác.</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var item in usersNotFollowed)
+                {
+                    <div class="friend-request" data-user-id="@item.Id">
+                        <div class="friend-info">
+                            <img src="@item.AvatarUrl" alt="User Avatar" class="user-avatar">
+                            <span class="user-name">@item.FullName</span>
+                        </div>
+                        <div class="friend-actions">
+                            <button class="btn-add">Thêm bạn bè</button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .search-container {
+            width: 100%;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Tabs Navigation */
+        .search-tabs {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .search-tab-link {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #555;
+            transition: 0.3s;
+        }
+
+            .search-tab-link:hover,
+            .search-tab-link.search-active {
+                color: #007bff;
+                border-bottom: 2px solid #007bff;
+            }
+
+
+        .search-tab-pane {
+            display: none;
+        }
+
+            .search-tab-pane.search-active {
+                display: block;
+            }
+    </style>
+}
+
+@section Scripts
+{
+    <!-- Script -->
+    <script>
+        function openSearchTab(evt, tabId) {
+            // Ẩn tất cả search-tab-pane
+            const tabPanes = document.querySelectorAll('.search-tab-pane');
+            tabPanes.forEach(pane => pane.classList.remove('search-active'));
+
+            // Xóa active trên tất cả search-tab-link
+            const tabLinks = document.querySelectorAll('.search-tab-link');
+            tabLinks.forEach(link => link.classList.remove('search-active'));
+
+            // Hiển thị tab được chọn và thêm class search-active
+            document.getElementById(tabId).classList.add('search-active');
+            evt.currentTarget.classList.add('search-active');
+        }
+    </script>
+}
