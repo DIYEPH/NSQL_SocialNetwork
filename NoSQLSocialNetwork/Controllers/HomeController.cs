@@ -25,54 +25,89 @@ namespace NoSQLSocialNetwork.Controllers
         {
             if (User.Identity?.IsAuthenticated == true)
             {
-				var claimsPrincipal = User as ClaimsPrincipal;
-				var userIdClaim = claimsPrincipal?.FindFirst(ClaimTypes.NameIdentifier);
+                var claimsPrincipal = User as ClaimsPrincipal;
+                var userIdClaim = claimsPrincipal?.FindFirst(ClaimTypes.NameIdentifier);
 
-				if (_users == null)
-					return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Database connection error." });
+                if (_users == null)
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Database connection error." });
 
-				if (userIdClaim != null)
-				{
-					var userId = ObjectId.Parse(userIdClaim.Value);
-					var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
-					var listFollowings = user?.Followings ?? new List<ObjectId>();
+                if (userIdClaim != null)
+                {
+                    var userId = ObjectId.Parse(userIdClaim.Value);
+                    var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
                     if (user != null)
-					{
-						listFollowings.Add(user.Id);
-						var users = await _users.Find(u => listFollowings.Contains(u.Id)).ToListAsync();
-						var posts = new List<PostVM>();
+                    {
+                        // Lấy danh sách người theo dõi
+                        var listFollowings = user.Followings ?? new List<ObjectId>();
+                        listFollowings.Add(user.Id);
+
+                        // Lấy danh sách người dùng liên quan
+                        var users = await _users.Find(u => listFollowings.Contains(u.Id)).ToListAsync();
+
+                        // Chuẩn bị danh sách bài viết
+                        var posts = new List<PostVM>();
+
                         foreach (var u in users)
                         {
-                            // Lấy bài viết của người dùng này
-                            var postsUser = u.Posts ?? new List<Post>(); // Nếu không có bài viết, tạo một danh sách rỗng
+                            var postsUser = u.Posts ?? new List<Post>();
+
                             foreach (var post in postsUser)
                             {
-                                bool isLiked = post.Likes != null && post.Likes.Contains(userId); // Kiểm tra xem người dùng có thích bài viết này không
+                                bool isLiked = post.Likes != null && post.Likes.Contains(userId);
+
+                                // Chuẩn bị danh sách bình luận
+                                var comments = new List<CommentVM>();
+                                foreach (var comment in post.Comments ?? new List<Comment>())
+                                {
+                                    var userComment = await _users.Find(uc => uc.Id == comment.UserId).FirstOrDefaultAsync();
+                                    if (userComment != null)
+                                    {
+                                        comments.Add(new CommentVM
+                                        {
+                                            Id = comment.Id,
+                                            UserId = userComment.Id,
+                                            FullName = userComment.FullName,
+                                            Content = comment.Content,
+                                            Status = comment.Status,
+                                            AvatarUrl = userComment.AvatarUrl,
+                                            CreateAt = comment.CreateAt,
+                                        });
+                                    }
+                                }
+
+                                // Sắp xếp bình luận theo thời gian
+                                var sortedComments = comments.OrderByDescending(c => c.CreateAt).ToList();
+
+                                // Thêm bài viết vào danh sách
                                 posts.Add(new PostVM
                                 {
                                     Id = post.Id,
                                     AuthorId = post.AuthorId,
-                                    AuthorAvatar = u.AvatarUrl, // Avatar của người dùng này
-                                    AuthorName = u.FullName, // Tên người dùng này
+                                    AuthorAvatar = u.AvatarUrl,
+                                    AuthorName = u.FullName,
                                     Content = post.Content,
                                     ImageUrls = post.ImageUrls,
                                     Likes = post.Likes,
                                     Status = post.Status,
                                     CreatedAt = post.CreatedAt,
                                     UpdatedAt = post.UpdatedAt,
-                                    //Comments = post.Comments,
-                                    IsLiked = isLiked
+                                    IsLiked = isLiked,
+                                    Comments = sortedComments
                                 });
                             }
                         }
+
+                        // Sắp xếp bài viết theo thời gian
                         var sortedPosts = posts.OrderByDescending(p => p.CreatedAt).ToList();
 
                         return View(sortedPosts);
                     }
-				}
-			}
-			return Unauthorized();
-		}
+                }
+            }
+
+            return Unauthorized();
+        }
 
         public IActionResult Privacy()
         {

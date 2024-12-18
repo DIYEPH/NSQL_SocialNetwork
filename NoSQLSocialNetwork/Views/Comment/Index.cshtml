@@ -57,13 +57,7 @@
                 </a>
                 <span>@(Model.Likes?.Count() ?? 0)</span>
             </div>
-            <div>
-                <a>
-                    <img src="images/comments.png" alt="Comments">
-                </a>
 
-                @(Model.Comments?.Count() ?? 0)
-            </div>
             <div>
                 <img src="images/share.png" alt="Share">
             </div>
@@ -72,8 +66,8 @@
     </div>
     <div class="comments-section">
         <div class="comment-input">
-            <form method="post" action="@Url.Action("Comment/AddComment", "Post", new { postId = Model.Id })">
-                <textarea name="CommentContent" placeholder="Viết bình luận..."></textarea>
+            <form id="commentForm" method="post" action="@Url.Action("AddComment", "Post", new { postId = Model.Id })">
+                <textarea name="Content" id="commentContent" placeholder="Viết bình luận..."></textarea>
                 <button type="submit">Bình luận</button>
             </form>
         </div>
@@ -83,7 +77,7 @@
             {
                 <div class="comment-item">
                     <div class="comment-author">
-                        <img src="a" alt="Avatar">
+                        <img src="@comment.AvatarUrl" alt="Avatar">
                         <p>@comment.FullName</p>
                     </div>
                     <p>@comment.Content</p>
@@ -93,8 +87,57 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#commentForm').on('submit', function (e) {
+                e.preventDefault(); // Ngừng hành động mặc định là tải lại trang
+
+                var content = $('#commentContent').val().trim(); // Lấy nội dung bình luận và loại bỏ khoảng trắng
+                if (!content) {
+                    alert('Nội dung bình luận không được để trống.');
+                    return;
+                }
+
+                var postId = '@Model.Id'; // Lấy postId từ Model
+
+                // Gửi yêu cầu AJAX
+                $.ajax({
+                    url: '@Url.Action("AddComment", "Comment")',
+                    method: 'POST',
+                    contentType: 'application/json', // Định nghĩa dữ liệu là JSON
+                    data: JSON.stringify({
+                        Content: content,
+                        PostId: postId
+                    }),
+                    success: function (response) {
+                        console.log("Server response:", response); // Kiểm tra phản hồi từ server
+                        if (response.success) {
+                            // Tạo HTML cho bình luận mới
+                            var newComment = `
+                                <div class="comment-item">
+                                    <div class="comment-author">
+                                        <img src="${response.avatarUrl}" alt="Avatar">
+                                        <p>${response.fullName}</p>
+                                    </div>
+                                    <p>${response.content}</p>
+                                    <span>${response.createdAt}</span>
+                                </div>`;
+                            $('.comments-list').append(newComment); // Thêm bình luận vào danh sách
+                            $('#commentContent').val(''); // Xóa nội dung trong textarea
+                        } else {
+                            alert(response.message || 'Có lỗi xảy ra, vui lòng thử lại.');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error details:", xhr.responseText);
+                        alert('Có lỗi xảy ra, vui lòng thử lại.');
+                    }
+                });
+            });
+        });
+
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('[name="btnLike"]').forEach(button => {

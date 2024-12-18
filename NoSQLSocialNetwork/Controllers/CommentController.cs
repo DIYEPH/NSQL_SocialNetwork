@@ -91,7 +91,7 @@ namespace NoSQLSocialNetwork.Controllers
             return View(null);
         }
         [HttpPost("Comment/AddComment")]
-        public async Task<IActionResult> AddComment(string postId)
+        public async Task<IActionResult> AddComment([FromBody] CommentRequest comment)
         {
             if (User.Identity?.IsAuthenticated == true)
             {
@@ -99,7 +99,7 @@ namespace NoSQLSocialNetwork.Controllers
                 var userIdClaim = claimsPrincipal?.FindFirst(ClaimTypes.NameIdentifier);
                 if (_users == null)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Database connection error." });
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { success = false, message = "Database connection error." });
                 }
                 if (userIdClaim != null)
                 {
@@ -107,31 +107,50 @@ namespace NoSQLSocialNetwork.Controllers
                     var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
                     if (user != null)
                     {
-                        var filter = Builders<User>.Filter.ElemMatch(u => u.Posts, p => p.Id == ObjectId.Parse(postId));
+                        var filter = Builders<User>.Filter.ElemMatch(u => u.Posts, p => p.Id == ObjectId.Parse(comment.PostId));
                         var foundUser = await _users.Find(filter).FirstOrDefaultAsync();
                         if (foundUser != null)
                         {
-                            var post = foundUser.Posts?.FirstOrDefault(p => p.Id == ObjectId.Parse(postId));
+                            var post = foundUser.Posts?.FirstOrDefault(p => p.Id == ObjectId.Parse(comment.PostId));
                             if (post != null)
                             {
-                                var comment = new Comment
+                                var commentNew = new Comment
                                 {
                                     UserId = userId,
-                                    Content = Request.Form["content"],
+                                    Content = comment.Content,
                                     CreateAt = DateTime.Now,
                                     Status = 1
                                 };
+
                                 post.Comments ??= new List<Comment>();
-                                post.Comments.Add(comment);
+                                post.Comments.Add(commentNew);
+
                                 var update = Builders<User>.Update.Set(u => u.Posts, foundUser.Posts);
                                 await _users.UpdateOneAsync(u => u.Id == foundUser.Id, update);
-                                return RedirectToAction("Index", new { postId = postId });
+
+                                // Trả về thông tin cho frontend
+                                return Ok(new
+                                {
+                                    success = true,
+                                    commentId = commentNew.Id.ToString(),
+                                    avatarUrl = user.AvatarUrl, // Giả sử bạn có trường AvatarUrl trong model User
+                                    fullName = user.FullName,   // Giả sử bạn có trường FullName trong model User
+                                    content = commentNew.Content,
+                                    createdAt = commentNew.CreateAt.ToString("yyyy-MM-dd HH:mm:ss")
+                                });
                             }
                         }
                     }
                 }
             }
-            return RedirectToAction("Index", new { postId = postId });
+
+            return Unauthorized(new { success = false, message = "User is not authenticated" });
         }
+
     }
+}
+public class CommentRequest
+{
+    public string? PostId { get; set; }
+    public string? Content { get; set; }
 }

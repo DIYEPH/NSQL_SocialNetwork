@@ -5,6 +5,7 @@ namespace NoSQLSocialNetwork.ViewModels
 {
     public class CommentVM
     {
+        public ObjectId Id { get; set; }
         public ObjectId UserId { get; set; }
 
         public string? FullName { get; set; }
