@@ -5,6 +5,12 @@ namespace NoSQLSocialNetwork.Entities
 {
     public class Comment
     {
+        public Comment()
+        {
+            Id = ObjectId.GenerateNewId();
+        }
+        [BsonId]
+        public ObjectId Id { get; set; }
         [BsonElement("userId")]
         public ObjectId UserId { get; set; }
 
